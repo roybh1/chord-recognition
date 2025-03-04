@@ -1,0 +1,10 @@
+Pipfile
+.idea/
+.ipynb*
+.python-version
+__pycache__/
+*.pyc
+*.pyo
+*/__pycache__/
+.vscode/
+.pytest_cache/
