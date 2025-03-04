@@ -1,0 +1,13 @@
+urllib3
+matplotlib
+numpy
+ipython
+librosa
+#midi
+pretty-midi
+scipy
+hmmlearn
+scikit-learn
+jupyter
+pandas
+
