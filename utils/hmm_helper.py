@@ -20,7 +20,7 @@ def calc_transition_prob_matrix(chords_annotation, test_version=False):
     sequence_chords = pd.DataFrame({'initial_chords': initial_chords, 'sequence_chord': sequence_chord})
     prob_matrix = sequence_chords.groupby('initial_chords').apply(__calc_prob_chord).reset_index().drop('level_1', axis=1)
     prob_matrix = prob_matrix.pivot(index='initial_chords', columns='sequence_chord', values='transition_prob')
-    prob_matrix.append(pd.Series(np.zeros(prob_matrix.shape[1]), name='<END>'))
+    prob_matrix = pd.concat([prob_matrix, pd.Series(np.zeros(prob_matrix.shape[1]), name='<END>')])
     prob_matrix = prob_matrix.fillna(0)
     if(test_version == False):
         prob_matrix['<START>'] = 0.
