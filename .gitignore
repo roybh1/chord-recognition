@@ -112,3 +112,6 @@ tensorboard_logs/
 # Temporary files
 tmp/
 temp/
+
+.venv/
+.python-version
