@@ -3,8 +3,9 @@ import numpy as np
 import os
 
 from utils.annotations import read_simplify_chord_file
+from utils.signal import COL_NAMES_NOTES
 
-COL_NAMES_NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+# COL_NAMES_NOTES = ["C", "C#","Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B"]
 FULL_CHORDS = ["C", "C#","Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "C:min", "C#:min", "Db:min", "D:min", "D#:min", "Eb:min", "E:min", "F:min", "F#:min", "Gb:min", "G:min", "G#:min", "Ab:min", "A:min", "A#:min", "Bb:min", "B:min"]
 
 def __calc_prob_chord(chord_group):
@@ -62,21 +63,20 @@ def calc_initial_state_prob_matrix(process_silence=False, annotations_folder_pat
 
     first_chord_counts = np.unique(first_chords, return_counts=True)
     initial_state_probs = pd.Series(first_chord_counts[1]/first_chord_counts[1].sum(), index=first_chord_counts[0])
-    #add <START> and <END> to the initial state probabilities
-    initial_state_probs = initial_state_probs.append(pd.Series([0.], index=['<START>']))
-    initial_state_probs = initial_state_probs.append(pd.Series([1.], index=['<END>']))
-    # add all the other chords with 0 probability from
+    
+    # Replace append with pandas.concat
+    # add <START> and <END> to the initial state probabilities
+    initial_state_probs = pd.concat([initial_state_probs, pd.Series([0.], index=['<START>'])])
+    initial_state_probs = pd.concat([initial_state_probs, pd.Series([1.], index=['<END>'])])
+    
+    # add all the other chords with 0 probability
     for chord in FULL_CHORDS:
         if chord not in initial_state_probs.index:
-            initial_state_probs = initial_state_probs.append(pd.Series([0.], index=[chord]))
+            initial_state_probs = pd.concat([initial_state_probs, pd.Series([0.], index=[chord])])
 
     return initial_state_probs
 
 def adapt_initial_prob_matrix(init_states, transition_matrix):
-    existing_states = []
-    for v in transition_matrix.columns.values:
-        if v  in init_states.index:
-            existing_states.append(v)
-    filtered_initial_states = init_states[existing_states]
+    filtered_initial_states = init_states[transition_matrix.columns.values]
     filtered_initial_states = filtered_initial_states/filtered_initial_states.sum()
     return filtered_initial_states.fillna(0)
